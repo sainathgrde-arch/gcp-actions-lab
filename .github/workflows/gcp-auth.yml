@@ -31,4 +31,7 @@ jobs:
         run: |
          gcloud auth list
          gcloud config list
+      - name: Test GCP access
+        run: |
+         gcloud projects list
 
