@@ -27,3 +27,8 @@ jobs:
         run: |
           gcloud auth list
           gcloud projects list
+      - name: Who am I?  
+        run: |
+         gcloud auth list
+         gcloud config list
+
