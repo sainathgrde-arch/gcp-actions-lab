@@ -23,15 +23,11 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Test GCP access
+      - name: Deploy to Cloud Run
         run: |
-          gcloud auth list
-          gcloud projects list
-      - name: Who am I?  
-        run: |
-         gcloud auth list
-         gcloud config list
-      - name: Test GCP access
-        run: |
-         gcloud projects list
+          gcloud run deploy cloudrun-demo \
+          --source . \
+          --region us-central1 \
+          --platform managed \
+          --allow-unauthenticated
 
