@@ -32,10 +32,10 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Build & push image with Cloud Build
+      - name: Build & push
         run: |
-          gcloud builds submit ./cloudrun-demo \
-            --tag "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }}"
+         cd cloudrun-demo
+         gcloud builds submit --tag "$IMAGE" .
 
       - name: Deploy to Cloud Run
         run: |
