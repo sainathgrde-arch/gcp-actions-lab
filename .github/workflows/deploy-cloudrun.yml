@@ -1,20 +1,29 @@
-name: Deploy to Cloud Run
+name: Deploy Cloud Run
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     permissions:
-      contents: read
       id-token: write
+      contents: read
+
+    env:
+      PROJECT_ID: optimal-relic-481321-h7
+      REGION: us-central1
+      SERVICE: cloudrun-demo
+      REPO: cloudrun-repo
+      IMAGE: cloudrun-demo
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Auth to GCP (WIF)
+      - name: Auth to Google Cloud (WIF)
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: "projects/106713737818/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
@@ -23,10 +32,15 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Deploy to Cloud Run (source)
+      - name: Build & push image with Cloud Build
         run: |
-          gcloud config set project optimal-relic-481321-h7
-          gcloud run deploy cloudrun-pipeline-demo \
-            --source . \
-            --region us-central1 \
+          gcloud builds submit \
+            --tag "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }}"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${{ env.SERVICE }}" \
+            --image "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO }}/${{ env.IMAGE }}:${{ github.sha }}" \
+            --region "${{ env.REGION }}" \
             --allow-unauthenticated
+
